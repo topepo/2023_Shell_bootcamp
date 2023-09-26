@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "2023_AstraZeneca",
+    "section": "",
+    "text": ".pull-left[ .font90[ * R has always had a rich set of modeling tools that it inherited from S. For example, the formula interface has made it simple to specify potentially complex model structures.\n\nR has cutting edge models. Many researchers in various domains use R as their primary computing environment and their work often results in R packages.\nIt is easy to port or link to other applications. R doesn’t try to be everything to everyone. ] ]\n\n.pull-right[ However, there is a huge consistency problem. For example: * There are two primary methods for specifying what terms are in a model. Not all models have both. * 99% of model functions automatically generate dummy variables. * Many package developers don’t know much about the language and omit OOP and other core R components.\nTwo examples follow… ]"
+  },
+  {
+    "objectID": "index.html#our-job-is-to-make-modeling-data-with-r-suck-less-better1.",
+    "href": "index.html#our-job-is-to-make-modeling-data-with-r-suck-less-better1.",
+    "title": "2023_AstraZeneca",
+    "section": "Our job is to make modeling data with R suck less better1.",
+    "text": "Our job is to make modeling data with R suck less better1."
+  },
+  {
+    "objectID": "index.html#modeling-includes-everything-from-classical-statistical-methods-to-machine-learning.",
+    "href": "index.html#modeling-includes-everything-from-classical-statistical-methods-to-machine-learning.",
+    "title": "2023_AstraZeneca",
+    "section": "“Modeling” includes everything from classical statistical methods to machine learning.",
+    "text": "“Modeling” includes everything from classical statistical methods to machine learning.\n.footnote[1 Narrator: It’s actually pretty good]\n]"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  }
+]

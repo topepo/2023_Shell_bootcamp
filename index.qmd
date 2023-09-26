@@ -1,0 +1,1124 @@
+---
+title: "(tidy)Modeling Workshop"
+author: "Max Kuhn"
+title-slide-attributes:
+  data-background-image: images/hex_wall.png
+  data-background-size: contain
+  data-background-opacity: "0.07"
+format:
+  revealjs: 
+    slide-number: true
+    footer: <https://topepo.github.io/2023_Shell_bootcamp>
+    include-before-body: header.html
+    include-after-body: footer-annotations.html    
+    theme: [default, tidymodels.scss]
+    width: 1280
+    height: 720
+knitr:
+  opts_chunk: 
+    echo: true
+    collapse: true
+    comment: "#>"
+---
+
+
+
+```{r startup}
+#| include: false
+#| warning: false
+#| message: false
+library(glmnet)
+library(glue)
+
+options(digits = 3, width = 80)
+
+knitr::opts_chunk$set(
+    comment = "#>",
+    fig.path = "figures/",
+    dev = 'svg',
+    dev.args = list(bg = "transparent")
+  )
+
+library(doMC)
+registerDoMC(cores = parallel::detectCores(logical = TRUE))
+
+```
+
+## About me
+
+ - Becton-Dickinson (6y): molecular diagnostics for infectious diseases, non-clinical and clinical
+ - Pfizer (12y): nonclinical, Med chem, Comp {bio,chem} support
+ - <span style="color:LightGray;"><strike>RStudio</strike></span> posit PBC (>= 2016): modeling packages
+ 
+Selected R packages: [`caret`](https://topepo.github.io/caret/), [`C50`](https://topepo.github.io/C5.0/), [`Cubist`](https://topepo.github.io/Cubist/), a lot of [tidymodels](https://github.com/orgs/tidymodels/repositories)
+
+ - [_Applied Predictive Modeling_](http://appliedpredictivemodeling.com)
+ - [_Feature Engineering and Selection_](https://bookdown.org/max/FES)
+ - [_Tidy Models with R_](http://tmwr.org)
+ - [_Nonclinical Statistics for Pharmaceutical and Biotechnology Industries_](https://link.springer.com/book/10.1007/978-3-319-23558-5) (ed, auth) 
+
+## Modeling in R
+
+* R has always had a rich set of modeling tools that it inherited from S. For example, the formula interface has made it simple to specify potentially complex model structures.   
+
+* _R has cutting-edge models_. Many researchers in various domains use R as their primary computing environment and their work often results in R packages.
+
+* _It is easy to port or link to other applications_. R doesn't try to be everything to everyone.
+
+
+## Modeling in R
+However, there is a huge _consistency problem_. For example: 
+
+* There are two primary methods for specifying what terms are in a model. Not all models have both. 
+* 99% of model functions automatically generate dummy variables. 
+* Many package developers don't know much about the language and omit OOP and other core R components.
+
+Two examples follow... 
+
+
+
+
+## Between-Package Inconsistency
+
+The syntax for computing predicted class probabilities:
+
+::: {.incremental}
+- `MASS` package: `predict(lda_fit)` 
+- `stats` package: `predict(glm_fit, type = "response")` 
+- `gbm` package: `predict(gbm_fit, type = "response", n.trees)`
+- `mda` package: `predict(mda_fit, type = "posterior")` 
+- `rpart` package: `predict(rpart_fit, type = "prob")` 
+- `RWeka` package: `predict(bagging_fit, type = "probability")` 
+- `pamr` package: `pamr.predict(pamr_fit, type = "posterior")`
+:::
+
+
+## Within-Package Inconsistency: `glmnet` Predictions
+
+```{r glmnet-mod}
+#| include: false
+sim_n <- 300
+
+set.seed(1244)
+dat <- data.frame(
+  two_class = rep(letters[1:2], each = sim_n / 2),
+  three_class = rep(letters[1:3], each = sim_n / 3),
+  numeric = rnorm(sim_n) + 10,
+  x1 = rnorm(sim_n),
+  x2 = rnorm(sim_n),
+  x3 = rnorm(sim_n),
+  x4 = rnorm(sim_n)
+)
+
+x <- as.matrix(dat[,-(1:3)])
+new_x <- head(x, 2)
+rownames(new_x) <- paste0("sample_", 1:2)
+
+penalties <- c(0.0001, 0.001, 0.01)
+reg_mod <-
+  glmnet(x, y = dat$numeric, lambda = penalties)
+
+two_class_mod <-
+  glmnet(
+    x,
+    y = dat$two_class,
+    nlambda = 3,
+    family = "binomial", 
+    lambda = penalties
+  )
+
+three_class_mod <-
+  glmnet(
+    x,
+    y = dat$three_class,
+    nlambda = 3,
+    family = "multinomial", 
+    lambda = penalties
+  )
+
+three_pred <- predict(three_class_mod, newx = new_x, type = "response")
+three_pred <- apply(three_pred, 3, function(x) data.frame(x)) 
+three_pred <- dplyr::bind_rows(three_pred)
+three_pred <- dplyr::mutate(three_pred, lambda = rep(three_class_mod$lambda, each = 2))
+three_pred <- tibble::as_tibble(three_pred)
+three_pred$.row <- rep(1:3, each = 2)
+```
+ 
+The `glmnet` model can be used to fit regularized generalized linear models with a mixture of L<sub>1</sub> and L<sub>2</sub> penalties. 
+
+We'll look at what happens when we get predictions for a regression model (i.e. numeric _Y_) as well as classification models where _Y_ has two or three categorical values. 
+
+- The models shown below contain solutions for three regularization values ( $\lambda$ ). 
+
+- The predict method gives the results for all three at once (`r emojifont::emoji('+1')`).
+
+## Numeric `glmnet` Predictions
+
+Predicting a numeric outcome for two new data points:
+
+
+```{r glmnet-reg}
+new_x
+
+predict(reg_mod, newx = new_x)
+```
+
+A matrix result and we will assume that the $\lambda$ values are in the same order as what we gave to the model fit function.
+
+
+
+## `glmnet` predictions formats
+
+. . .
+
+**Numeric model, numeric prediction**
+
+ - numeric sample x penalty array
+
+. . .
+
+**Binary model, class prediction**
+
+- _character_ sample x penalty array 
+
+. . .
+
+**Binary model, probability prediction**
+
+- _numeric_ sample x penalty array (values are 2nd factor level)
+
+. . .
+
+**Multinomial model, probability prediction**
+
+- _numeric_ class x sample x penalty array
+
+
+## `glmnet` predictions formats
+
+`r emojifont::emoji('flushed')`
+
+Most people have at least four different scripts for the same model
+
+> _Am I working for `glmnet` or is it is working for me?_
+
+Maybe a structure like this would work better:
+
+```{r better-glmnet}
+#| echo: false
+three_pred
+```
+
+
+
+# tidymodels: Our job is to make modeling data with R <span style="color:LightGray;"><strike>suck less</strike></span> better.
+
+# _It's actually pretty good_
+
+# "Modeling" includes everything from classical statistical methods to machine learning. 
+
+
+
+## The Tidyverse
+
+
+The [tidyverse](http://www.tidyverse.org/) is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures. 
+
+
+The principles of the tidyverse: 
+
+1. Reuse existing data structures.
+1. Compose simple functions with the pipe.
+1. Embrace functional programming.
+1. Design for humans.
+
+This results in more specific conventions around interfaces, function naming, etc. 
+
+## The Tidyverse
+
+For example, we try to use common prefixes for auto-complete:  `tune_grid()`, `tune_bayes()`, ...
+
+There is also the notion of [tidy data](http://vita.had.co.nz/papers/tidy-data.pdf):
+
+1. Each variable forms a column.
+1. Each observation forms a row.
+1. Each type of observational unit forms a table.
+
+Based on these ideas, we can create modeling packages that have predictable results and are a pleasure to use. 
+
+
+## Tidymodels 
+
+`tidymodels` is a collection of modeling packages that live in the tidyverse and are designed in the same way. 
+
+My goals for tidymodels are:
+
+1. Encourage empirical validation and good methodology.
+
+1. Smooth out diverse interfaces.
+
+1. Build highly reusable infrastructure.
+
+1. Enable a wider variety of methodologies.
+
+
+# [`tidymodels.org`](https://www.tidymodels.org/)
+
+# _Tidy Modeling with R_ ([`tmwr.org`](https://www.tmwr.org/))
+
+# [`workshops.tidymodels.org`](https://workshops.tidymodels.org/)
+
+
+
+
+## Selected Modeling Packages 
+
+
+* [`broom`](https://broom.tidymodels.org/) takes the messy output of built-in functions in R, such as `lm`, `nls`, or `t.test`, and turns them into tidy data frames.
+
+* [`recipes`](https://recipes.tidymodels.org/) is a general data preprocessor with a modern interface. It can create model matrices that incorporate feature engineering, imputation, and other tools.
+
+* [`rsample`](https://rsample.tidymodels.org/) has infrastructure for _resampling_ data so that models can be assessed and empirically validated. 
+
+* [`parsnip`](https://parsnip.tidymodels.org/) gives us a unified modeling interface.
+
+* [`tune`](https://tune.tidymodels.org/) has functions for grid search and sequential optimization of model parameters. 
+
+
+
+
+
+
+## Loading the Meta-Package 
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r detach}
+#| include: false
+detach("package:glmnet", character.only = TRUE)
+detach("package:Matrix", character.only = TRUE)
+detach("package:stats", character.only = TRUE)
+```
+```{r load-tm}
+#| warning: false
+library(tidymodels)
+tidymodels_prefer()
+
+data(Chicago, package = "modeldata")
+```
+:::
+
+::: {.column width="50%"}
+Let's start by predicting the [ridership of the Chicago "L" trains](https://bookdown.org/max/FES/chicago-intro.html). 
+
+We have data over 5,698 days between 2001 and 2016 in `Chicago`.
+
+What are our predictors? Date, weather data, home game schedules, 14-day lags at other stations. 
+:::
+
+::::
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-base}
+chicago_rec <- recipe(ridership ~ ., data = Chicago)
+```
+
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-date}
+#| code-line-numbers: "2"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) 
+```
+
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-holiday}
+#| code-line-numbers: "3"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) 
+```
+
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-rm}
+#| code-line-numbers: "4"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id")  
+```
+
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-dummy}
+#| code-line-numbers: "5"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id") %>% 
+  step_dummy(all_nominal_predictors())  
+```
+
+
+
+Other selectors are:
+
+ * `all_nominal()`, `all_numeric()`, and `has_type()`
+ 
+ * `all_predictors()`, `all_outcomes()`, and `has_role()`
+ 
+ * `all_numeric_predictors()` and `all_nominal_predictors()` too
+ 
+ * Standard `dplyr` selectors like `starts_with()` and so on. 
+
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-norm}
+#| code-line-numbers: "6"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id") %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) 
+```
+
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-pca}
+#| code-line-numbers: "7"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id") %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_pca(one_of(stations), num_comp = 10) 
+```
+
+
+
+
+## What are our _features_?
+
+```{r chicago-recipe-umap}
+#| code-line-numbers: "7-8"
+#| eval: false
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id") %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  # In the embed package:
+  step_umap(one_of(stations), outcome = vars(ridership), num_comp = 10) 
+```
+
+
+
+
+## What are our _features_?
+
+```{r chicago-recipe-ns}
+#| code-line-numbers: "7"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id") %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_spline_natural(Harlem, deg_free = 5) 
+```
+
+
+
+## What are our _features_? 
+
+```{r chicago-recipe-mutate}
+#| code-line-numbers: "7"
+chicago_rec <- recipe(ridership ~ ., data = Chicago) %>% 
+  step_date(date, features = c("dow", "month", "year")) %>% 
+  step_holiday(date) %>% 
+  update_role(date, new_role = "id") %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_mutate(temp = (32 * temp - 32) * 5 / 9 ) 
+```
+
+<br><br>
+
+***Let's fit a linear regression model!***
+
+With `parsnip`, we first create an object that specifies the _type_ of model and then the software _engine_ to do the fit. 
+
+
+
+## Linear regression specification 
+
+:::: {.columns}
+
+::: {.column width="40%"}
+```{r parsnip-lm-spec}
+linear_mod <- linear_reg() 
+
+# Defaults to `lm()`
+```
+:::
+
+::: {.column width="60%"}
+
+This says "Let's fit a model with a numeric outcome, and intercept, and slopes for each predictor."
+
+* Other model types include `nearest_neighbors()`, `decision_tree()`, `rand_forest()`, `arima_reg()`, and so on.
+
+
+The `set_engine()` function gives the details on _how_ it should be fit. 
+
+:::
+
+::::
+
+
+
+## Let's fit it with... 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+```{r parsnip-lm}
+#| code-line-numbers: "3"
+linear_mod <- 
+  linear_reg() %>% 
+  set_engine("lm")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-lm-nope}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-nope.png")
+```
+:::
+
+::::
+
+
+## Let's fit it with... 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+```{r parsnip-keras}
+#| code-line-numbers: "3"
+linear_mod <- 
+  linear_reg() %>% 
+  set_engine("keras")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-keras-nope}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-nope.png")
+```
+:::
+
+::::
+
+## Let's fit it with... 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+```{r parsnip-torch}
+#| code-line-numbers: "3"
+linear_mod <- 
+  linear_reg() %>% 
+  set_engine("brulee")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-torch-nope}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-nope.png")
+```
+:::
+
+::::
+
+## Let's fit it with... 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+```{r parsnip-spark}
+#| code-line-numbers: "3"
+linear_mod <- 
+  linear_reg() %>% 
+  set_engine("spark")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-spark-nope}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-nope.png")
+```
+:::
+
+::::
+
+## Let's fit it with...
+
+:::: {.columns}
+
+::: {.column width="60%"}
+```{r parsnip-stan}
+#| code-line-numbers: "3"
+linear_mod <- 
+  linear_reg() %>% 
+  set_engine("stan")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-stan-nope}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-nope.png")
+```
+:::
+
+::::
+
+
+## Let's fit it with... 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+```{r parsnip-glmnet}
+#| code-line-numbers: "3"
+linear_mod <- 
+  linear_reg() %>% 
+  set_engine("glmnet")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-glmnet-yep}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-yes.png")
+```
+:::
+
+::::
+
+## Let's fit it with... 
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+```{r parsnip-glmnet-param}
+#| code-line-numbers: "2"
+linear_mod <- 
+  linear_reg(penalty = 0.1, mixture = 0.5) %>% 
+  set_engine("glmnet")
+
+```
+:::
+
+::: {.column width="40%"}
+```{r parsnip-glmnet-param-yep}
+#| echo: false
+#| out-width: 100%
+#| fig-align: "center"
+knitr::include_graphics("images/geordi-yes.png")
+```
+:::
+
+
+::::
+
+
+```{r reattach, include = FALSE}
+library(glmnet)
+library(stats)
+```
+
+
+## A modeling _workflow_ 
+
+We can _optionally_ bundle the recipe and model together into a <span style="color:LightGray;"><strike>pipeline</strike></span> _workflow_:
+
+```{r workflow}
+glmnet_wflow <- 
+  workflow() %>% 
+  add_model(linear_mod) %>% 
+  add_recipe(chicago_rec) # or add_formula() or add_variables()
+```
+
+Fitting and prediction are very easy:
+
+
+```{r workflow-fit}
+glmnet_fit <- fit(glmnet_wflow, data = Chicago)
+
+# Very east to use compared to glmnet::predict():
+predict(glmnet_fit, Chicago %>% slice(1:7))
+```
+
+
+
+
+
+## Model tuning 
+
+We probably don't have a good idea of what the `penalty` and `mixture` values should be. 
+
+We can _mark them for tuning_ :
+
+```{r tuning}
+#| code-line-numbers: "2"
+linear_mod <- 
+  linear_reg(penalty = tune(), mixture = tune()) %>% 
+  set_engine("glmnet")
+
+glmnet_wflow <- 
+  glmnet_wflow %>% 
+  update_model(linear_mod)
+```
+
+Recipe arguments can also be simultaneously tuned (e.g. `num_comp` in `step_pca()`). 
+
+More on this in the next example... 
+
+```{r theme}
+#| echo: false
+thm <- theme_bw() + 
+  theme(
+    panel.background = element_rect(fill = "transparent", colour = NA), 
+    plot.background = element_rect(fill = "transparent", colour = NA),
+    legend.position = "top",
+    legend.background = element_rect(fill = "transparent", colour = NA),
+    legend.key = element_rect(fill = "transparent", colour = NA)
+  )
+theme_set(thm)
+```
+
+
+```{r}
+#| label: more-pkgs
+#| echo: false
+library(finetune)
+library(probably)
+library(embed)
+library(themis)
+```
+
+## Example: Predicting cognitive function
+
+[Craig-Schapiro et al. (2011)](https://dx.plos.org/10.1371/journal.pone.0018850) describe a clinical study of 333 patients (cognitive impairment or healthy). 
+
+CSF samples were taken from all subjects. Data collected on each subject included:
+
+- Demographic characteristics such as age and gender
+- Apolipoprotein E genotype
+- Protein measurements of Aβ, Tau, and a phosphorylated version of Tau (pTau)
+- Protein measurements of 124 exploratory biomarkers, and
+- Clinical dementia scores
+
+
+## The data
+
+There is some class imbalance: 
+
+```{r}
+#| label: ad-intro
+data(ad_data, package = "modeldata")
+dim(ad_data)
+count(ad_data, Class)
+```
+
+We'll use stratified sampling to split the data to maintain the frequency distribution. 
+
+## Data splitting
+
+The initial training/test split (3:1) and resampling via the bootstrap: 
+
+```{r}
+#| label: ad-split
+set.seed(12)
+ad_split <- initial_split(ad_data, strata = Class)
+ad_train <- training(ad_split)
+ad_test  <- testing(ad_split)
+ad_boot <- bootstraps(ad_train, times = 50, strata = Class)
+
+ad_boot %>% slice(1) %>% pluck("splits") %>% pluck(1) %>% analysis() %>% count(Class)
+```
+
+We'll use the bootstrap to measure performance during tuning. 
+
+## Model and recipe
+
+Let's fit a neural network and use a simple recipe that standardizes the predictors. 
+
+We'll tune three model parameters:
+
+```{r}
+#| label: ad-specs
+nnet_mod <- 
+  mlp(hidden_units = tune(), penalty = tune(), epochs = tune()) %>% 
+  set_mode("classification")
+
+nnet_rec <- 
+  recipe(Class ~ ., data = ad_train) %>% 
+  step_dummy(Genotype) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_predictors())
+```
+
+ 
+
+## Model tuning via racing
+
+We'll use a tool called _racing_ to tune a large number of model configurations efficiently. 
+
+```{r}
+#| label: ad-tune
+#| results: hide
+#| cache: true
+
+library(finetune)
+
+set.seed(8239)
+nnet_tune_res <- 
+  nnet_mod %>% 
+  tune_race_anova(
+    nnet_rec,
+    resamples = ad_boot,
+    grid = 50,
+    control = control_race(verbose_elim = TRUE, save_pred = TRUE)
+  )
+```
+
+This only fits a fraction of the possible `r nrow(ad_boot) * 50` possible models via efficient interim analysis. 
+
+## Racing process
+
+```{r}
+#| label: racing-plot
+#| echo: false
+#| out-width: 50%
+#| fig-width: 5
+#| fig-height: 5
+#| fig-align: "center"
+
+plot_race(nnet_tune_res)
+```
+
+## Check predictions
+
+Let's take the model with the largest ROC AUC as best:
+
+```{r}
+#| label: pred-res
+show_best(nnet_tune_res, metric = "roc_auc")
+
+best_nnet <- select_best(nnet_tune_res, metric = "roc_auc")
+best_nnet
+
+oob_pred <- collect_predictions(nnet_tune_res, parameters = best_nnet)
+```
+
+The predictions are averages of the out-of-sample predictions, 
+
+## Check predictions
+
+So the model separates the classes but are the probabilities well-calibrated? 
+
+```{r}
+#| label: calib-plots
+#| echo: false
+#| out-width: 50%
+#| fig-width: 5
+#| fig-height: 5
+#| fig-align: "center"
+library(probably)
+cal_plot_windowed(oob_pred, truth = Class, estimate = .pred_Impaired, step_size = 0.025)
+```
+
+Yeah but no. Let's mitigate the issue via post-processing using a few different methods. 
+
+## Logistic calibration 
+
+```{r}
+#| label: logistic-cal
+set.seed(283)
+resampled_pred <- oob_pred %>% vfold_cv() 
+
+resampled_pred %>% 
+  cal_validate_logistic(truth = Class) %>% 
+  collect_metrics()
+```
+
+The Brier score is a good metric to assess how well the model is calibrated.
+
+A value of zero is best and a really bad model for two classes has a value of `(1 - (1/2))^2 = 0.25`.
+
+
+## Isotonic calibration 
+
+```{r}
+#| label: isotonic-cal
+resampled_pred %>% 
+  cal_validate_isotonic(truth = Class) %>% 
+  collect_metrics()
+```
+
+## Beta calibration 
+
+```{r}
+#| label: beta-cal
+resampled_pred %>% 
+  cal_validate_beta(truth = Class) %>% 
+  collect_metrics()
+```
+
+We'll try using the logistic model. 
+
+## Does it work?
+
+:::: {.columns}
+
+::: {.column width="56%"}
+```{r}
+#| label: recal-code
+#| eval: false
+ad_cal <- 
+  cal_estimate_logistic(oob_pred, truth = Class)
+
+calibrated_pred <- 
+  oob_pred %>% 
+  cal_apply(ad_cal)
+
+calibrated_pred %>%
+  cal_plot_windowed(truth = Class,
+                    estimate = .pred_Impaired,
+                    step_size = 0.025)
+```
+:::
+
+::: {.column width="44%"}
+```{r}
+#| label: recal-plot
+#| echo: false
+#| out-width: 80%
+#| fig-width: 5
+#| fig-height: 5
+#| fig-align: "center"
+ad_cal <- 
+  cal_estimate_logistic(oob_pred, truth = Class)
+
+calibrated_pred <- 
+  oob_pred %>% 
+  cal_apply(ad_cal)
+
+calibrated_pred %>%
+  cal_plot_windowed(truth = Class,
+                    estimate = .pred_Impaired,
+                    step_size = 0.025)
+```
+:::
+
+::::
+
+
+## Picking a final model
+
+Normally, after searching through models, we pick one that we think should go forward. 
+
+```{r}
+#| label: finalize
+nnet_wflow <- 
+  nnet_rec %>% 
+  workflow(nnet_mod) %>% 
+  finalize_workflow(best_nnet)
+nnet_wflow
+```
+
+## Fitting the final model
+
+Let's fit a model of ours on the the entire training set.
+
+If we originally used `initial_split()`, we can also use `last_fit()` to do this: 
+
+```{r}
+#| label: last-fit
+test_res <- 
+  nnet_wflow %>% 
+  last_fit(split = ad_split)
+
+extract_fit_engine(test_res)
+```
+
+## Test set evaluation
+
+_Ordinarily_, we would use `collect_metrics()` on this to get our test set results. 
+
+However, we have to apply the calibration the test set predictions first: 
+
+```{r}
+#| label: test-cal
+
+test_pred <- 
+  test_res %>% 
+  collect_predictions() %>% 
+  cal_apply(ad_cal)
+
+cls_metrics <- metric_set(roc_auc, brier_class)
+cls_metrics(test_pred, Class, .pred_Impaired)
+```
+
+## Test set ROC curve
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| label: roc-curve-calc
+#| eval: false
+test_pred %>% 
+  roc_curve(Class, .pred_Impaired) %>% 
+  autoplot()
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: roc-curve
+#| echo: false
+#| out-width: 100%
+#| fig-width: 5
+#| fig-height: 5
+#| fig-align: "center"
+
+test_pred %>% 
+  roc_curve(Class, .pred_Impaired) %>% 
+  autoplot()
+```
+:::
+
+::::
+
+
+## Test set calibration curve
+
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| label: test-cal-code
+#| eval: false
+test_pred %>%
+  cal_plot_windowed(truth = Class,
+                    estimate = .pred_Impaired,
+                    step_size = 0.025)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: test-cal-plot
+#| echo: false
+#| out-width: 100%
+#| fig-width: 5
+#| fig-height: 5
+#| fig-align: "center"
+# due to small sample size, use a logistic plot
+test_pred %>%
+  cal_plot_logistic(
+    truth = Class,
+    estimate = .pred_Impaired
+  )
+```
+:::
+
+::::
+
+
+## Next steps
+
+If this model was best, we would fit the model on the entire training set (via the `last_fit()`) function the measure performance on the test set. 
+
+Some other things to do with these data: 
+
+* [model explainers](https://www.tmwr.org/explain.html)
+
+* [model stacking](https://www.tmwr.org/ensembles.html)
+
+* [model deployment using vetiver](https://rstudio.github.io/vetiver-r/)
+
+
+## Other extensions
+
+- censored data models (a.k.a survival analysis)
+- case weights
+- conformal inference tools for prediction intervals
+
+In-process:
+
+- model fairness metrics and modeling techniques
+- causal inference methods
+- a general set of post-processing tools
+
+
+## Thanks
+
+Thanks for the invitation to speak today!
+
+The tidymodels team: **Hanna Frick, Emil Hvitfeldt, and Simon Couch**.
+
+Special thanks to the other folks who contributed so much to tidymodels: Davis Vaughan, Edgar Ruiz, Alison Hill, Desirée De Leon, our previous interns, and the tidyverse team.

@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2023_AstraZeneca</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">2023_AstraZeneca</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" rel="" target="" aria-current="page">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools ms-auto">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#modeling-in-r" id="toc-modeling-in-r" class="nav-link active" data-scroll-target="#modeling-in-r">Modeling in R</a></li>
+  <li><a href="#between-package-inconsistency" id="toc-between-package-inconsistency" class="nav-link" data-scroll-target="#between-package-inconsistency">Between-Package Inconsistency</a></li>
+  <li><a href="#within-package-inconsistency-glmnet-predictions" id="toc-within-package-inconsistency-glmnet-predictions" class="nav-link" data-scroll-target="#within-package-inconsistency-glmnet-predictions">Within-Package Inconsistency: <code>glmnet</code> Predictions</a></li>
+  <li><a href="#numeric-glmnet-predictions" id="toc-numeric-glmnet-predictions" class="nav-link" data-scroll-target="#numeric-glmnet-predictions">Numeric <code>glmnet</code> Predictions</a></li>
+  <li><a href="#glmnet-predictions-formats" id="toc-glmnet-predictions-formats" class="nav-link" data-scroll-target="#glmnet-predictions-formats"><code>glmnet</code> predictions formats</a></li>
+  <li><a href="#glmnet-predictions-formats-1" id="toc-glmnet-predictions-formats-1" class="nav-link" data-scroll-target="#glmnet-predictions-formats-1"><code>glmnet</code> predictions formats</a></li>
+  <li><a href="#what-we-need" id="toc-what-we-need" class="nav-link" data-scroll-target="#what-we-need">What We Need</a>
+  <ul class="collapse">
+  <li><a href="#our-job-is-to-make-modeling-data-with-r-suck-less-better1." id="toc-our-job-is-to-make-modeling-data-with-r-suck-less-better1." class="nav-link" data-scroll-target="#our-job-is-to-make-modeling-data-with-r-suck-less-better1.">Our job is to make modeling data with R <del>suck less</del> better<sup>1</sup>.</a></li>
+  <li><a href="#modeling-includes-everything-from-classical-statistical-methods-to-machine-learning." id="toc-modeling-includes-everything-from-classical-statistical-methods-to-machine-learning." class="nav-link" data-scroll-target="#modeling-includes-everything-from-classical-statistical-methods-to-machine-learning.">“Modeling” includes everything from classical statistical methods to machine learning.</a></li>
+  </ul></li>
+  <li><a href="#the-tidyverse" id="toc-the-tidyverse" class="nav-link" data-scroll-target="#the-tidyverse">The Tidyverse</a></li>
+  <li><a href="#tidymodels" id="toc-tidymodels" class="nav-link" data-scroll-target="#tidymodels">Tidymodels</a></li>
+  <li><a href="#tidymodels.org" id="toc-tidymodels.org" class="nav-link" data-scroll-target="#tidymodels.org"><code>tidymodels.org</code></a></li>
+  <li><a href="#tidy-modeling-with-r-tmwr.org" id="toc-tidy-modeling-with-r-tmwr.org" class="nav-link" data-scroll-target="#tidy-modeling-with-r-tmwr.org"><em>Tidy Modeling with R</em> (<code>tmwr.org</code>)</a></li>
+  <li><a href="#selected-modeling-packages" id="toc-selected-modeling-packages" class="nav-link" data-scroll-target="#selected-modeling-packages">Selected Modeling Packages</a></li>
+  <li><a href="#loading-the-meta-package" id="toc-loading-the-meta-package" class="nav-link" data-scroll-target="#loading-the-meta-package">Loading the Meta-Package <img src="images/tidymodels.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features" id="toc-what-are-our-features" class="nav-link" data-scroll-target="#what-are-our-features">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-1" id="toc-what-are-our-features-1" class="nav-link" data-scroll-target="#what-are-our-features-1">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-2" id="toc-what-are-our-features-2" class="nav-link" data-scroll-target="#what-are-our-features-2">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-3" id="toc-what-are-our-features-3" class="nav-link" data-scroll-target="#what-are-our-features-3">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-4" id="toc-what-are-our-features-4" class="nav-link" data-scroll-target="#what-are-our-features-4">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-5" id="toc-what-are-our-features-5" class="nav-link" data-scroll-target="#what-are-our-features-5">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-6" id="toc-what-are-our-features-6" class="nav-link" data-scroll-target="#what-are-our-features-6">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-7" id="toc-what-are-our-features-7" class="nav-link" data-scroll-target="#what-are-our-features-7">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"><img src="images/embed.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-8" id="toc-what-are-our-features-8" class="nav-link" data-scroll-target="#what-are-our-features-8">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#what-are-our-features-9" id="toc-what-are-our-features-9" class="nav-link" data-scroll-target="#what-are-our-features-9">What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></a></li>
+  <li><a href="#linear-regression-specification" id="toc-linear-regression-specification" class="nav-link" data-scroll-target="#linear-regression-specification">Linear regression specification <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#lets-fit-it-with" id="toc-lets-fit-it-with" class="nav-link" data-scroll-target="#lets-fit-it-with">Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#lets-fit-it-with-1" id="toc-lets-fit-it-with-1" class="nav-link" data-scroll-target="#lets-fit-it-with-1">Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#lets-fit-it-with-2" id="toc-lets-fit-it-with-2" class="nav-link" data-scroll-target="#lets-fit-it-with-2">Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#lets-fit-it-with-3" id="toc-lets-fit-it-with-3" class="nav-link" data-scroll-target="#lets-fit-it-with-3">Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#lets-fit-it-with-4" id="toc-lets-fit-it-with-4" class="nav-link" data-scroll-target="#lets-fit-it-with-4">Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#lets-fit-it-with-5" id="toc-lets-fit-it-with-5" class="nav-link" data-scroll-target="#lets-fit-it-with-5">Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#a-modeling-workflow" id="toc-a-modeling-workflow" class="nav-link" data-scroll-target="#a-modeling-workflow">A modeling <em>workflow</em> <img src="images/workflows.svg" class="title-hex"><img src="images/recipes.svg" class="title-hex"><img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#model-tuning" id="toc-model-tuning" class="nav-link" data-scroll-target="#model-tuning">Model tuning <img src="images/workflows.svg" class="title-hex"><img src="images/tune.svg" class="title-hex"><img src="images/recipes.svg" class="title-hex"><img src="images/parsnip.svg" class="title-hex"></a></li>
+  <li><a href="#resampling-and-grid-search" id="toc-resampling-and-grid-search" class="nav-link" data-scroll-target="#resampling-and-grid-search">Resampling and grid search <img src="images/tune.svg" class="title-hex"><img src="images/rsample.svg" class="title-hex"></a></li>
+  <li><a href="#grid-search-results" id="toc-grid-search-results" class="nav-link" data-scroll-target="#grid-search-results">Grid search results <img src="images/tune.svg" class="title-hex"><img src="images/ggplot2.svg" class="title-hex"></a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  <li><a href="#principles-of-modeling-packages" id="toc-principles-of-modeling-packages" class="nav-link" data-scroll-target="#principles-of-modeling-packages">Principles of Modeling Packages</a></li>
+  <li><a href="#making-better-packages" id="toc-making-better-packages" class="nav-link" data-scroll-target="#making-better-packages">Making better packages <img src="images/hardhat.svg" class="title-hex"></a></li>
+  <li><a href="#whats-cooking" id="toc-whats-cooking" class="nav-link" data-scroll-target="#whats-cooking">What’s cooking</a>
+  <ul class="collapse">
+  <li><a href="#mlops" id="toc-mlops" class="nav-link" data-scroll-target="#mlops">MLOps</a></li>
+  <li><a href="#censored-data-models-a.k.a-survival-analysis" id="toc-censored-data-models-a.k.a-survival-analysis" class="nav-link" data-scroll-target="#censored-data-models-a.k.a-survival-analysis">censored data models (a.k.a survival analysis)</a></li>
+  <li><a href="#case-weights" id="toc-case-weights" class="nav-link" data-scroll-target="#case-weights">Case weights</a></li>
+  <li><a href="#supervise-feature-selection" id="toc-supervise-feature-selection" class="nav-link" data-scroll-target="#supervise-feature-selection">Supervise feature selection</a></li>
+  </ul></li>
+  <li><a href="#thanks" id="toc-thanks" class="nav-link" data-scroll-target="#thanks">Thanks</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">2023_AstraZeneca</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="modeling-in-r" class="level1">
+<h1>Modeling in R</h1>
+<p>.pull-left[ .font90[ * R has always had a rich set of modeling tools that it inherited from S. For example, the formula interface has made it simple to specify potentially complex model structures.</p>
+<ul>
+<li><p><em>R has cutting edge models</em>. Many researchers in various domains use R as their primary computing environment and their work often results in R packages.</p></li>
+<li><p><em>It is easy to port or link to other applications</em>. R doesn’t try to be everything to everyone. ] ]</p></li>
+</ul>
+<p>.pull-right[ However, there is a huge <em>consistency problem</em>. For example: * There are two primary methods for specifying what terms are in a model. Not all models have both. * 99% of model functions automatically generate dummy variables. * Many package developers don’t know much about the language and omit OOP and other core R components.</p>
+<p>Two examples follow… ]</p>
+</section>
+<section id="between-package-inconsistency" class="level1">
+<h1>Between-Package Inconsistency</h1>
+<p>Syntax for computing predicted class probabilities:</p>
+<table class="table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 18%">
+<col style="width: 61%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Package</th>
+<th style="text-align: left;">Code</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>lda</code></td>
+<td style="text-align: left;"><code>MASS</code></td>
+<td style="text-align: left;"><code>predict(obj)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>glm</code></td>
+<td style="text-align: left;"><code>stats</code></td>
+<td style="text-align: left;"><code>predict(obj, type = "response")</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>gbm</code></td>
+<td style="text-align: left;"><code>gbm</code></td>
+<td style="text-align: left;"><code>predict(obj, type = "response", n.trees)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>mda</code></td>
+<td style="text-align: left;"><code>mda</code></td>
+<td style="text-align: left;"><code>predict(obj, type = "posterior")</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>rpart</code></td>
+<td style="text-align: left;"><code>rpart</code></td>
+<td style="text-align: left;"><code>predict(obj, type = "prob")</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Weka</code></td>
+<td style="text-align: left;"><code>RWeka</code></td>
+<td style="text-align: left;"><code>predict(obj, type = "probability")</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>logitboost</code></td>
+<td style="text-align: left;"><code>LogitBoost</code></td>
+<td style="text-align: left;"><code>predict(obj, type = "raw", nIter)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>pamr.train</code></td>
+<td style="text-align: left;"><code>pamr</code></td>
+<td style="text-align: left;"><code>pamr.predict(obj, type = "posterior")</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="within-package-inconsistency-glmnet-predictions" class="level1">
+<h1>Within-Package Inconsistency: <code>glmnet</code> Predictions</h1>
+<p>The <code>glmnet</code> model can be used to fit regularized generalized linear models with a mixture of L<sub>1</sub> and L<sub>2</sub> penalties.</p>
+<p>We’ll look at what happens when we get predictions for a regression model (i.e.&nbsp;numeric <em>Y</em>) as well as classification models where <em>Y</em> has two or three categorical values.</p>
+<p>The models shown below contain solutions for three regularization values ( <span class="math inline">\(\lambda\)</span> ).</p>
+<p>The predict method gives the results for all three at once (👍).</p>
+</section>
+<section id="numeric-glmnet-predictions" class="level1">
+<h1>Numeric <code>glmnet</code> Predictions</h1>
+<p>Predicting a numeric outcome for two new data points:</p>
+<div class="cell" data-layout-align="center">
+<pre><code>#&gt;             x1     x2     x3     x4
+#&gt; sample_1 1.649 -0.483 -0.294 -0.815
+#&gt; sample_2 0.656 -0.420  0.880  0.109
+#&gt;            s0   s1 s2
+#&gt; sample_1 9.95 9.95 10
+#&gt; sample_2 9.95 9.95 10</code></pre>
+</div>
+<p>A matrix result and we will assume that the <span class="math inline">\(\lambda\)</span> values are in the same order as what we gave to the model fit function.</p>
+</section>
+<section id="glmnet-predictions-formats" class="level1">
+<h1><code>glmnet</code> predictions formats</h1>
+<p><strong>Numeric model, numeric prediction</strong></p>
+<ul>
+<li>numeric sample x penalty array</li>
+</ul>
+<p>–</p>
+<p><strong>Binary model, class prediction</strong></p>
+<ul>
+<li><em>character</em> sample x penalty array (Note: outcome input is required to be a factor)</li>
+</ul>
+<p>–</p>
+<p><strong>Binary model, probability prediction</strong></p>
+<ul>
+<li><em>numeric</em> sample x penalty array (values are 2nd factor level)</li>
+</ul>
+<p>–</p>
+<p><strong>Multinomial model, probability prediction</strong></p>
+<ul>
+<li><em>numeric</em> class x sample x penalty array</li>
+</ul>
+</section>
+<section id="glmnet-predictions-formats-1" class="level1">
+<h1><code>glmnet</code> predictions formats</h1>
+<p>😳</p>
+<p>Most people have at least four different scripts for the same model</p>
+<blockquote class="blockquote">
+<p><em>Am I working for <code>glmnet</code> or is it is working for me?</em></p>
+</blockquote>
+<p>Maybe a structure like this would work better:</p>
+<div class="cell" data-layout-align="center">
+<pre><code>#&gt; # A tibble: 6 × 4
+#&gt;       a     b     c lambda
+#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+#&gt; 1 0.333 0.333 0.333   1   
+#&gt; 2 0.333 0.333 0.333   1   
+#&gt; 3 0.333 0.333 0.333   0.1 
+#&gt; 4 0.333 0.333 0.333   0.1 
+#&gt; 5 0.373 0.244 0.383   0.01
+#&gt; 6 0.327 0.339 0.334   0.01</code></pre>
+</div>
+</section>
+<section id="what-we-need" class="level1">
+<h1>What We Need</h1>
+<p>Unless you are doing a simple one-off data analysis, the lack of consistency between, and sometimes within, R packages can be very frustrating.</p>
+<p>If we could agree on a set of common conventions for interfaces, return values, and other components, everyone’s life would be easier.</p>
+<p>Once we agree on conventions, <strong>two challenges</strong> are:</p>
+<ul>
+<li><p>As of Jun 2023, there are over 19K R packages on CRAN. How do we “harmonize” these without breaking everything?</p></li>
+<li><p>How can we guide new R users (or people unfamiliar with R) in making good choices in their modeling packages?</p></li>
+</ul>
+<p>These prospective and retrospective problems will be addressed in a minute.</p>
+<p>.pull-left[</p>
+<section id="our-job-is-to-make-modeling-data-with-r-suck-less-better1." class="level2">
+<h2 class="anchored" data-anchor-id="our-job-is-to-make-modeling-data-with-r-suck-less-better1.">Our job is to make modeling data with R <del>suck less</del> better<sup>1</sup>.</h2>
+</section>
+<section id="modeling-includes-everything-from-classical-statistical-methods-to-machine-learning." class="level2">
+<h2 class="anchored" data-anchor-id="modeling-includes-everything-from-classical-statistical-methods-to-machine-learning.">“Modeling” includes everything from classical statistical methods to machine learning.</h2>
+<p>.footnote[<sup>1</sup> Narrator: <em>It’s actually pretty good</em>]</p>
+<p>]</p>
+</section>
+</section>
+<section id="the-tidyverse" class="level1">
+<h1>The Tidyverse</h1>
+<p>.pull-left[</p>
+<p>The <a href="http://www.tidyverse.org/">tidyverse</a> is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures.</p>
+<p>The principles of the tidyverse:</p>
+<ol type="1">
+<li>Reuse existing data structures.</li>
+<li>Compose simple functions with the pipe.</li>
+<li>Embrace functional programming.</li>
+<li>Design for humans.</li>
+</ol>
+<p>This results in more specific conventions around interfaces, function naming, etc.</p>
+<p>]s .pull-right[ For example, we try to use common prefixes for auto-complete: <code>grid_latin_hypercube()</code>, <code>grid_max_entropy()</code>, …</p>
+<p>There is also the notion of <a href="http://vita.had.co.nz/papers/tidy-data.pdf">tidy data</a>:</p>
+<ol type="1">
+<li>Each variable forms a column.</li>
+<li>Each observation forms a row.</li>
+<li>Each type of observational unit forms a table.</li>
+</ol>
+<p>Based on these ideas, we can create modeling packages that have predictable results and are a pleasure to use.</p>
+<p>]</p>
+</section>
+<section id="tidymodels" class="level1">
+<h1>Tidymodels</h1>
+<p><code>tidymodels</code> is a collection of modeling packages that live in the tidyverse and are designed in the same way.</p>
+<p>My goals for tidymodels are:</p>
+<ol type="1">
+<li><p>Encourage empirical validation and good methodology.</p></li>
+<li><p>Smooth out diverse interfaces.</p></li>
+<li><p>Build highly reusable infrastructure.</p></li>
+<li><p>Enable a wider variety of methodologies.</p></li>
+</ol>
+<p>The <code>tidymodels</code> packages address the <em>retrospective</em> and <em>prospective</em> issues. We are also developing a set of principles and templates to make <em>prospective</em> (new R packages) easy to create.</p>
+</section>
+<section id="tidymodels.org" class="level1">
+<h1><a href="https://www.tidymodels.org/"><code>tidymodels.org</code></a></h1>
+</section>
+<section id="tidy-modeling-with-r-tmwr.org" class="level1">
+<h1><em>Tidy Modeling with R</em> (<a href="https://www.tmwr.org/"><code>tmwr.org</code></a>)</h1>
+</section>
+<section id="selected-modeling-packages" class="level1">
+<h1>Selected Modeling Packages</h1>
+<ul>
+<li><p><a href="https://broom.tidymodels.org/"><code>broom</code></a> takes the messy output of built-in functions in R, such as <code>lm</code>, <code>nls</code>, or <code>t.test</code>, and turns them into tidy data frames.</p></li>
+<li><p><a href="https://recipes.tidymodels.org/"><code>recipes</code></a> is a general data preprocessor with a modern interface. It can create model matrices that incorporate feature engineering, imputation, and other tools.</p></li>
+<li><p><a href="https://rsample.tidymodels.org/"><code>rsample</code></a> has infrastructure for <em>resampling</em> data so that models can be assessed and empirically validated.</p></li>
+<li><p><a href="https://parsnip.tidymodels.org/"><code>parsnip</code></a> gives us a unified modeling interface.</p></li>
+<li><p><a href="https://tune.tidymodels.org/"><code>tune</code></a> has functions for grid search and sequential optimization of model parameters.</p></li>
+</ul>
+</section>
+<section id="loading-the-meta-package" class="level1">
+<h1>Loading the Meta-Package <img src="images/tidymodels.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>.code60[</p>
+<p>]</p>
+<p>] .pull-right-a-little[</p>
+<p>.font90[</p>
+<p>Let’s start by predicting the <a href="https://bookdown.org/max/FES/chicago-intro.html">ridership of the Chicago “L” trains</a>.</p>
+<p>We have data over 5,698 days between 2001 and 2016 in <code>data(Chicago, package = "modeldata")</code>.</p>
+<p>What are our predictors? Date, weather data, home game schedules, 14-day lags at other stations. ]</p>
+<p>]</p>
+</section>
+<section id="what-are-our-features" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-1" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-2" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-3" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-4" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+<p>Other selectors are:</p>
+<ul>
+<li><p><code>all_nominal()</code>, <code>all_numeric()</code>, and <code>has_type()</code></p></li>
+<li><p><code>all_predictors()</code>, <code>all_outcomes()</code>, and <code>has_role()</code></p></li>
+<li><p><code>all_numeric_predictors()</code> and <code>all_nominal_predictors()</code> too</p></li>
+<li><p>Standard <code>dplyr</code> selectors like <code>starts_with()</code> and so on.</p></li>
+</ul>
+</section>
+<section id="what-are-our-features-5" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-6" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-7" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"><img src="images/embed.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-8" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+</section>
+<section id="what-are-our-features-9" class="level1">
+<h1>What are our <em>features</em>? <img src="images/recipes.svg" class="title-hex"></h1>
+<p><br><br></p>
+<p><strong><em>Let’s fit a linear regression model!</em></strong></p>
+<p>With <code>parsnip</code>, we first create an object that specifies the <em>type</em> of model and then the software <em>engine</em> to do the fit.</p>
+</section>
+<section id="linear-regression-specification" class="level1">
+<h1>Linear regression specification <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>This says “Let’s fit a model with a numeric outcome, and intercept, and slopes for each predictor.”</p>
+<ul>
+<li>Other model types include <code>nearest_neighbors()</code>, <code>decision_tree()</code>, <code>rand_forest()</code>, <code>arima_reg()</code>, and so on.</li>
+</ul>
+<p>The <code>set_engine()</code> function gives the details on <em>how</em> it should be fit.</p>
+<p>]</p>
+</section>
+<section id="lets-fit-it-with" class="level1">
+<h1>Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>] .pull-right-a-little[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/drake-nope.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="lets-fit-it-with-1" class="level1">
+<h1>Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>] .pull-right-a-little[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/drake-nope.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="lets-fit-it-with-2" class="level1">
+<h1>Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>] .pull-right-a-little[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/drake-nope.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="lets-fit-it-with-3" class="level1">
+<h1>Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>] .pull-right-a-little[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/drake-nope.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="lets-fit-it-with-4" class="level1">
+<h1>Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>] .pull-right-a-little[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/drake-yep.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="lets-fit-it-with-5" class="level1">
+<h1>Let’s fit it with… <img src="images/parsnip.svg" class="title-hex"></h1>
+<p>.pull-left-a-lot[</p>
+<p>] .pull-right-a-little[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/drake-yep.png" class="img-fluid figure-img" style="width:100.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="a-modeling-workflow" class="level1">
+<h1>A modeling <em>workflow</em> <img src="images/workflows.svg" class="title-hex"><img src="images/recipes.svg" class="title-hex"><img src="images/parsnip.svg" class="title-hex"></h1>
+<p>We can <em>optionally</em> bundle the recipe and model together into a <span style="color:LightGray;"><strike>pipeline</strike></span> <em>workflow</em>:</p>
+<p>Fitting and prediction are very easy:</p>
+<div class="cell" data-layout-align="center">
+<pre><code>#&gt; # A tibble: 7 × 1
+#&gt;   .pred
+#&gt;   &lt;dbl&gt;
+#&gt; 1 13.8 
+#&gt; 2 15.0 
+#&gt; 3 14.7 
+#&gt; 4 14.6 
+#&gt; 5 14.1 
+#&gt; 6  2.36
+#&gt; 7  1.73</code></pre>
+</div>
+</section>
+<section id="model-tuning" class="level1">
+<h1>Model tuning <img src="images/workflows.svg" class="title-hex"><img src="images/tune.svg" class="title-hex"><img src="images/recipes.svg" class="title-hex"><img src="images/parsnip.svg" class="title-hex"></h1>
+<p>We probably don’t have a good idea for what <code>penalty</code> and <code>mixture</code> should be?</p>
+<p>We can <em>mark them for tuning</em> :</p>
+<p>Recipe arguments can also be simultaneously tuned (e.g.&nbsp;<code>num_comp</code> in <code>step_pca()</code>).</p>
+</section>
+<section id="resampling-and-grid-search" class="level1">
+<h1>Resampling and grid search <img src="images/tune.svg" class="title-hex"><img src="images/rsample.svg" class="title-hex"></h1>
+<p>We’ll use time series resampling and grid search to optimize the model:</p>
+<p>.code80[</p>
+<p>.pull-left[</p>
+<div class="cell" data-layout-align="center">
+<pre><code>#&gt; # Sliding period resampling 
+#&gt; # A tibble: 17 × 2
+#&gt;    splits            id     
+#&gt;    &lt;list&gt;            &lt;chr&gt;  
+#&gt;  1 &lt;split [5463/14]&gt; Slice01
+#&gt;  2 &lt;split [5467/14]&gt; Slice02
+#&gt;  3 &lt;split [5467/14]&gt; Slice03
+#&gt;  4 &lt;split [5467/14]&gt; Slice04
+#&gt;  5 &lt;split [5467/14]&gt; Slice05
+#&gt;  6 &lt;split [5467/14]&gt; Slice06
+#&gt;  7 &lt;split [5467/14]&gt; Slice07
+#&gt;  8 &lt;split [5467/14]&gt; Slice08
+#&gt;  9 &lt;split [5467/14]&gt; Slice09
+#&gt; 10 &lt;split [5467/14]&gt; Slice10
+#&gt; 11 &lt;split [5467/14]&gt; Slice11
+#&gt; 12 &lt;split [5467/14]&gt; Slice12
+#&gt; 13 &lt;split [5467/14]&gt; Slice13
+#&gt; 14 &lt;split [5467/14]&gt; Slice14
+#&gt; 15 &lt;split [5467/14]&gt; Slice15
+#&gt; 16 &lt;split [5467/14]&gt; Slice16
+#&gt; 17 &lt;split [5467/11]&gt; Slice17</code></pre>
+</div>
+<p>]</p>
+<p>.pull-right[</p>
+<div class="cell" data-layout-align="center">
+<pre><code>#&gt; # A tibble: 5 × 8
+#&gt;         penalty mixture .metric .estimator  mean     n std_err .config          
+#&gt;           &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;            
+#&gt; 1 0.00000000489   0.794 rmse    standard    1.74    17   0.219 Preprocessor1_Mo…
+#&gt; 2 0.00000000226   0.832 rmse    standard    1.75    17   0.219 Preprocessor1_Mo…
+#&gt; 3 0.00302         0.505 rmse    standard    1.75    17   0.220 Preprocessor1_Mo…
+#&gt; 4 0.00765         0.652 rmse    standard    1.75    17   0.222 Preprocessor1_Mo…
+#&gt; 5 0.00000000128   0.955 rmse    standard    1.75    17   0.219 Preprocessor1_Mo…</code></pre>
+</div>
+<p>]</p>
+<p>]</p>
+</section>
+<section id="grid-search-results" class="level1">
+<h1>Grid search results <img src="images/tune.svg" class="title-hex"><img src="images/ggplot2.svg" class="title-hex"></h1>
+<p>.pull-left[ Grid points using the default space-filling design:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/plot-grid-1.svg" class="img-fluid figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>] .pull-right[</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/plot-grid-res-1.svg" class="img-fluid figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>]</p>
+</section>
+<section id="next-steps" class="level1">
+<h1>Next steps</h1>
+<p>There are functions to plot the results, substitute the best parameters for the <code>tune()</code> placeholders, fit the final model, measure the test set performance, etc etc.</p>
+<p>Other features:</p>
+<p>.font80[</p>
+<ul>
+<li><p><a href="https://www.tmwr.org/grid-search.html#racing">racing</a></p></li>
+<li><p><a href="https://www.tmwr.org/trust.html">applicability domain</a> methods</p></li>
+<li><p><a href="https://www.tmwr.org/explain.html">model explainers</a></p></li>
+<li><p><a href="https://www.tmwr.org/ensembles.html">model stacking</a></p></li>
+</ul>
+<p>]</p>
+<p>These API’s focus on harmonizing <em>Existing</em> packages.</p>
+<p>(If we still have time) Let’s talk about designing better packages.</p>
+</section>
+<section id="principles-of-modeling-packages" class="level1">
+<h1>Principles of Modeling Packages</h1>
+<p>.font90[ We have <a href="https://tidymodels.github.io/model-implementation-principles/">a set of <em>guidelines</em></a> for making good modeling packages. For example:</p>
+<ul>
+<li>Separate the interface that the <strong>modeler</strong> uses from the code to do the computations. They serve two very different purposes.</li>
+<li>Have multiple interfaces (e.g.&nbsp;formula, x/y, etc).</li>
+<li>The <em>user-facing interface</em> should use the most appropriate data structures for the data (as opposed to the computations). For example, factor outcomes versus 0/1 indicators and data frames versus matrices.</li>
+<li><code>type = "prob"</code> for class probabilities 😄.</li>
+<li>Use S3 methods.<br>
+</li>
+<li>The <code>predict</code> method should give standardized, predictable results.</li>
+</ul>
+<p>Rather than try to make methodologists into software developers, have tools to <strong>help them create high quality modeling packages</strong>.</p>
+<p>]</p>
+</section>
+<section id="making-better-packages" class="level1">
+<h1>Making better packages <img src="images/hardhat.svg" class="title-hex"></h1>
+<p>We have methods for creating all of the S3 scaffolding for modeling packages.</p>
+<p>You have some functions for creating a model fit; <code>hardhat</code> provides a package directory using best practices:</p>
+<p>There is a <a href="https://canal.uned.es/video/5dd25b9f5578f275e407dd88">video demo</a> that shows how to create a package in 9 steps.</p>
+</section>
+<section id="whats-cooking" class="level1">
+<h1>What’s cooking</h1>
+<section id="mlops" class="level3">
+<h3 class="anchored" data-anchor-id="mlops">MLOps</h3>
+<p>Model Operations tools for deploying, monitoring, and updating models.</p>
+</section>
+<section id="censored-data-models-a.k.a-survival-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="censored-data-models-a.k.a-survival-analysis">censored data models (a.k.a survival analysis)</h3>
+<p>These models are used to predict time-to-event data (in medicine, sports, HR, etc).</p>
+</section>
+<section id="case-weights" class="level3">
+<h3 class="anchored" data-anchor-id="case-weights">Case weights</h3>
+<p>Not sexy. Really tedious. Often requested. This will impact many of the tidymodels packages.</p>
+</section>
+<section id="supervise-feature-selection" class="level3">
+<h3 class="anchored" data-anchor-id="supervise-feature-selection">Supervise feature selection</h3>
+<p>Via recipe steps and other functions (e.g., <code>rfe()</code>).</p>
+</section>
+</section>
+<section id="thanks" class="level1">
+<h1>Thanks</h1>
+<p>Thanks for the invitation to speak today!</p>
+<p>The tidymodels team: Hanna Frick, Emil Hvitfeldt, and Simon Couch.</p>
+<p>Special thanks for the other folks who contributed so much to tidymodels: Edgar Ruiz, Alison Hill, Desirée De Leon, and the tidyverse team.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

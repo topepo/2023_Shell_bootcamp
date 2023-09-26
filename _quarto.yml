@@ -1,0 +1,22 @@
+project:
+  type: website
+  render:
+    - "index.qmd"
+  output-dir: docs
+
+website:
+  title: "Intoduction to tidymodels"
+  site-url: https://topepo.github.io/2023_AstraZeneca
+  repo-url: https://github.com/topepo/2023_AstraZeneca
+  page-footer:
+    left: |
+      Proudly supported by
+      [![](https://www.rstudio.com/wp-content/uploads/2018/10/RStudio-Logo-flat.svg){fig-alt="RStudio" width=65px}](https://www.rstudio.com)
+
+format:
+  html:
+    code-line-numbers: true
+    theme: cosmo
+    css: styles.css
+
+fig-format: svg
