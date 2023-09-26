@@ -1,0 +1,373 @@
+[
+  {
+    "objectID": "index.html#about-me",
+    "href": "index.html#about-me",
+    "title": "(tidy)Modeling Workshop",
+    "section": "About me",
+    "text": "About me\n\nBecton-Dickinson (6y): molecular diagnostics for infectious diseases, non-clinical and clinical\nPfizer (12y): nonclinical, Med chem, Comp {bio,chem} support\nRStudio posit PBC (&gt;= 2016): modeling packages\n\nSelected R packages: caret, C50, Cubist, a lot of tidymodels\n\nApplied Predictive Modeling\nFeature Engineering and Selection\nTidy Models with R\nNonclinical Statistics for Pharmaceutical and Biotechnology Industries (ed, auth)"
+  },
+  {
+    "objectID": "index.html#modeling-in-r",
+    "href": "index.html#modeling-in-r",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Modeling in R",
+    "text": "Modeling in R\n\nR has always had a rich set of modeling tools that it inherited from S. For example, the formula interface has made it simple to specify potentially complex model structures.\nR has cutting-edge models. Many researchers in various domains use R as their primary computing environment and their work often results in R packages.\nIt is easy to port or link to other applications. R doesn’t try to be everything to everyone."
+  },
+  {
+    "objectID": "index.html#modeling-in-r-1",
+    "href": "index.html#modeling-in-r-1",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Modeling in R",
+    "text": "Modeling in R\nHowever, there is a huge consistency problem. For example:\n\nThere are two primary methods for specifying what terms are in a model. Not all models have both.\n99% of model functions automatically generate dummy variables.\nMany package developers don’t know much about the language and omit OOP and other core R components.\n\nTwo examples follow…"
+  },
+  {
+    "objectID": "index.html#between-package-inconsistency",
+    "href": "index.html#between-package-inconsistency",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Between-Package Inconsistency",
+    "text": "Between-Package Inconsistency\nThe syntax for computing predicted class probabilities:\n\n\nMASS package: predict(lda_fit)\nstats package: predict(glm_fit, type = \"response\")\ngbm package: predict(gbm_fit, type = \"response\", n.trees)\nmda package: predict(mda_fit, type = \"posterior\")\nrpart package: predict(rpart_fit, type = \"prob\")\nRWeka package: predict(bagging_fit, type = \"probability\")\npamr package: pamr.predict(pamr_fit, type = \"posterior\")"
+  },
+  {
+    "objectID": "index.html#within-package-inconsistency-glmnet-predictions",
+    "href": "index.html#within-package-inconsistency-glmnet-predictions",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Within-Package Inconsistency: glmnet Predictions",
+    "text": "Within-Package Inconsistency: glmnet Predictions\nThe glmnet model can be used to fit regularized generalized linear models with a mixture of L1 and L2 penalties.\nWe’ll look at what happens when we get predictions for a regression model (i.e. numeric Y) as well as classification models where Y has two or three categorical values.\n\nThe models shown below contain solutions for three regularization values ( \\(\\lambda\\) ).\nThe predict method gives the results for all three at once (👍)."
+  },
+  {
+    "objectID": "index.html#numeric-glmnet-predictions",
+    "href": "index.html#numeric-glmnet-predictions",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Numeric glmnet Predictions",
+    "text": "Numeric glmnet Predictions\nPredicting a numeric outcome for two new data points:\n\nnew_x\n#&gt;             x1     x2     x3     x4\n#&gt; sample_1 1.649 -0.483 -0.294 -0.815\n#&gt; sample_2 0.656 -0.420  0.880  0.109\n\npredict(reg_mod, newx = new_x)\n#&gt;          s0 s1 s2\n#&gt; sample_1 10 10 10\n#&gt; sample_2 10 10 10\n\nA matrix result and we will assume that the \\(\\lambda\\) values are in the same order as what we gave to the model fit function."
+  },
+  {
+    "objectID": "index.html#glmnet-predictions-formats",
+    "href": "index.html#glmnet-predictions-formats",
+    "title": "(tidy)Modeling Workshop",
+    "section": "glmnet predictions formats",
+    "text": "glmnet predictions formats\n\nNumeric model, numeric prediction\n\nnumeric sample x penalty array\n\n\n\nBinary model, class prediction\n\ncharacter sample x penalty array\n\n\n\nBinary model, probability prediction\n\nnumeric sample x penalty array (values are 2nd factor level)\n\n\n\nMultinomial model, probability prediction\n\nnumeric class x sample x penalty array"
+  },
+  {
+    "objectID": "index.html#glmnet-predictions-formats-1",
+    "href": "index.html#glmnet-predictions-formats-1",
+    "title": "(tidy)Modeling Workshop",
+    "section": "glmnet predictions formats",
+    "text": "glmnet predictions formats\n😳\nMost people have at least four different scripts for the same model\n\nAm I working for glmnet or is it is working for me?\n\nMaybe a structure like this would work better:\n\n#&gt; # A tibble: 6 × 5\n#&gt;       a     b     c lambda  .row\n#&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.373 0.244 0.383 0.01       1\n#&gt; 2 0.327 0.339 0.334 0.01       1\n#&gt; 3 0.389 0.220 0.391 0.001      2\n#&gt; 4 0.326 0.337 0.338 0.001      2\n#&gt; 5 0.390 0.217 0.392 0.0001     3\n#&gt; 6 0.326 0.336 0.338 0.0001     3"
+  },
+  {
+    "objectID": "index.html#the-tidyverse",
+    "href": "index.html#the-tidyverse",
+    "title": "(tidy)Modeling Workshop",
+    "section": "The Tidyverse",
+    "text": "The Tidyverse\nThe tidyverse is an opinionated collection of R packages designed for data science. All packages share an underlying design philosophy, grammar, and data structures.\nThe principles of the tidyverse:\n\nReuse existing data structures.\nCompose simple functions with the pipe.\nEmbrace functional programming.\nDesign for humans.\n\nThis results in more specific conventions around interfaces, function naming, etc."
+  },
+  {
+    "objectID": "index.html#the-tidyverse-1",
+    "href": "index.html#the-tidyverse-1",
+    "title": "(tidy)Modeling Workshop",
+    "section": "The Tidyverse",
+    "text": "The Tidyverse\nFor example, we try to use common prefixes for auto-complete: tune_grid(), tune_bayes(), …\nThere is also the notion of tidy data:\n\nEach variable forms a column.\nEach observation forms a row.\nEach type of observational unit forms a table.\n\nBased on these ideas, we can create modeling packages that have predictable results and are a pleasure to use."
+  },
+  {
+    "objectID": "index.html#tidymodels",
+    "href": "index.html#tidymodels",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Tidymodels",
+    "text": "Tidymodels\ntidymodels is a collection of modeling packages that live in the tidyverse and are designed in the same way.\nMy goals for tidymodels are:\n\nEncourage empirical validation and good methodology.\nSmooth out diverse interfaces.\nBuild highly reusable infrastructure.\nEnable a wider variety of methodologies."
+  },
+  {
+    "objectID": "index.html#selected-modeling-packages",
+    "href": "index.html#selected-modeling-packages",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Selected Modeling Packages",
+    "text": "Selected Modeling Packages\n\nbroom takes the messy output of built-in functions in R, such as lm, nls, or t.test, and turns them into tidy data frames.\nrecipes is a general data preprocessor with a modern interface. It can create model matrices that incorporate feature engineering, imputation, and other tools.\nrsample has infrastructure for resampling data so that models can be assessed and empirically validated.\nparsnip gives us a unified modeling interface.\ntune has functions for grid search and sequential optimization of model parameters."
+  },
+  {
+    "objectID": "index.html#loading-the-meta-package",
+    "href": "index.html#loading-the-meta-package",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Loading the Meta-Package",
+    "text": "Loading the Meta-Package\n\n\n\nlibrary(tidymodels)\ntidymodels_prefer()\n\ndata(Chicago, package = \"modeldata\")\n\n\nLet’s start by predicting the ridership of the Chicago “L” trains.\nWe have data over 5,698 days between 2001 and 2016 in Chicago.\nWhat are our predictors? Date, weather data, home game schedules, 14-day lags at other stations."
+  },
+  {
+    "objectID": "index.html#what-are-our-features",
+    "href": "index.html#what-are-our-features",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago)"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-1",
+    "href": "index.html#what-are-our-features-1",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\"))"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-2",
+    "href": "index.html#what-are-our-features-2",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date)"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-3",
+    "href": "index.html#what-are-our-features-3",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\")"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-4",
+    "href": "index.html#what-are-our-features-4",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\") %&gt;% \n  step_dummy(all_nominal_predictors())  \n\nOther selectors are:\n\nall_nominal(), all_numeric(), and has_type()\nall_predictors(), all_outcomes(), and has_role()\nall_numeric_predictors() and all_nominal_predictors() too\nStandard dplyr selectors like starts_with() and so on."
+  },
+  {
+    "objectID": "index.html#what-are-our-features-5",
+    "href": "index.html#what-are-our-features-5",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\") %&gt;% \n  step_dummy(all_nominal_predictors()) %&gt;% \n  step_normalize(all_numeric_predictors())"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-6",
+    "href": "index.html#what-are-our-features-6",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\") %&gt;% \n  step_dummy(all_nominal_predictors()) %&gt;% \n  step_normalize(all_numeric_predictors()) %&gt;% \n  step_pca(one_of(stations), num_comp = 10)"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-7",
+    "href": "index.html#what-are-our-features-7",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\") %&gt;% \n  step_dummy(all_nominal_predictors()) %&gt;% \n  step_normalize(all_numeric_predictors()) %&gt;% \n  # In the embed package:\n  step_umap(one_of(stations), outcome = vars(ridership), num_comp = 10)"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-8",
+    "href": "index.html#what-are-our-features-8",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\") %&gt;% \n  step_dummy(all_nominal_predictors()) %&gt;% \n  step_normalize(all_numeric_predictors()) %&gt;% \n  step_spline_natural(Harlem, deg_free = 5)"
+  },
+  {
+    "objectID": "index.html#what-are-our-features-9",
+    "href": "index.html#what-are-our-features-9",
+    "title": "(tidy)Modeling Workshop",
+    "section": "What are our features?",
+    "text": "What are our features?\n\nchicago_rec &lt;- recipe(ridership ~ ., data = Chicago) %&gt;% \n  step_date(date, features = c(\"dow\", \"month\", \"year\")) %&gt;% \n  step_holiday(date) %&gt;% \n  update_role(date, new_role = \"id\") %&gt;% \n  step_dummy(all_nominal_predictors()) %&gt;% \n  step_normalize(all_numeric_predictors()) %&gt;% \n  step_mutate(temp = (32 * temp - 32) * 5 / 9 ) \n\n\nLet’s fit a linear regression model!\nWith parsnip, we first create an object that specifies the type of model and then the software engine to do the fit."
+  },
+  {
+    "objectID": "index.html#linear-regression-specification",
+    "href": "index.html#linear-regression-specification",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Linear regression specification",
+    "text": "Linear regression specification\n\n\n\nlinear_mod &lt;- linear_reg() \n\n# Defaults to `lm()`\n\n\nThis says “Let’s fit a model with a numeric outcome, and intercept, and slopes for each predictor.”\n\nOther model types include nearest_neighbors(), decision_tree(), rand_forest(), arima_reg(), and so on.\n\nThe set_engine() function gives the details on how it should be fit."
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with",
+    "href": "index.html#lets-fit-it-with",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg() %&gt;% \n  set_engine(\"lm\")"
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with-1",
+    "href": "index.html#lets-fit-it-with-1",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg() %&gt;% \n  set_engine(\"keras\")"
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with-2",
+    "href": "index.html#lets-fit-it-with-2",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg() %&gt;% \n  set_engine(\"brulee\")"
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with-3",
+    "href": "index.html#lets-fit-it-with-3",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg() %&gt;% \n  set_engine(\"spark\")"
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with-4",
+    "href": "index.html#lets-fit-it-with-4",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg() %&gt;% \n  set_engine(\"stan\")"
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with-5",
+    "href": "index.html#lets-fit-it-with-5",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg() %&gt;% \n  set_engine(\"glmnet\")"
+  },
+  {
+    "objectID": "index.html#lets-fit-it-with-6",
+    "href": "index.html#lets-fit-it-with-6",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Let’s fit it with…",
+    "text": "Let’s fit it with…\n\n\n\nlinear_mod &lt;- \n  linear_reg(penalty = 0.1, mixture = 0.5) %&gt;% \n  set_engine(\"glmnet\")"
+  },
+  {
+    "objectID": "index.html#a-modeling-workflow",
+    "href": "index.html#a-modeling-workflow",
+    "title": "(tidy)Modeling Workshop",
+    "section": "A modeling workflow",
+    "text": "A modeling workflow\nWe can optionally bundle the recipe and model together into a pipeline workflow:\n\nglmnet_wflow &lt;- \n  workflow() %&gt;% \n  add_model(linear_mod) %&gt;% \n  add_recipe(chicago_rec) # or add_formula() or add_variables()\n\nFitting and prediction are very easy:\n\nglmnet_fit &lt;- fit(glmnet_wflow, data = Chicago)\n\n# Very east to use compared to glmnet::predict():\npredict(glmnet_fit, Chicago %&gt;% slice(1:7))\n#&gt; # A tibble: 7 × 1\n#&gt;   .pred\n#&gt;   &lt;dbl&gt;\n#&gt; 1 13.8 \n#&gt; 2 15.0 \n#&gt; 3 14.7 \n#&gt; 4 14.6 \n#&gt; 5 14.1 \n#&gt; 6  2.36\n#&gt; 7  1.73"
+  },
+  {
+    "objectID": "index.html#model-tuning",
+    "href": "index.html#model-tuning",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Model tuning",
+    "text": "Model tuning\nWe probably don’t have a good idea of what the penalty and mixture values should be.\nWe can mark them for tuning :\n\nlinear_mod &lt;- \n  linear_reg(penalty = tune(), mixture = tune()) %&gt;% \n  set_engine(\"glmnet\")\n\nglmnet_wflow &lt;- \n  glmnet_wflow %&gt;% \n  update_model(linear_mod)\n\nRecipe arguments can also be simultaneously tuned (e.g. num_comp in step_pca()).\nMore on this in the next example…"
+  },
+  {
+    "objectID": "index.html#example-predicting-cognitive-function",
+    "href": "index.html#example-predicting-cognitive-function",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Example: Predicting cognitive function",
+    "text": "Example: Predicting cognitive function\nCraig-Schapiro et al. (2011) describe a clinical study of 333 patients (cognitive impairment or healthy).\nCSF samples were taken from all subjects. Data collected on each subject included:\n\nDemographic characteristics such as age and gender\nApolipoprotein E genotype\nProtein measurements of Aβ, Tau, and a phosphorylated version of Tau (pTau)\nProtein measurements of 124 exploratory biomarkers, and\nClinical dementia scores"
+  },
+  {
+    "objectID": "index.html#the-data",
+    "href": "index.html#the-data",
+    "title": "(tidy)Modeling Workshop",
+    "section": "The data",
+    "text": "The data\nThere is some class imbalance:\n\ndata(ad_data, package = \"modeldata\")\ndim(ad_data)\n#&gt; [1] 333 131\ncount(ad_data, Class)\n#&gt; # A tibble: 2 × 2\n#&gt;   Class        n\n#&gt;   &lt;fct&gt;    &lt;int&gt;\n#&gt; 1 Impaired    91\n#&gt; 2 Control    242\n\nWe’ll use stratified sampling to split the data to maintain the frequency distribution."
+  },
+  {
+    "objectID": "index.html#data-splitting",
+    "href": "index.html#data-splitting",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Data splitting",
+    "text": "Data splitting\nThe initial training/test split (3:1) and resampling via the bootstrap:\n\nset.seed(12)\nad_split &lt;- initial_split(ad_data, strata = Class)\nad_train &lt;- training(ad_split)\nad_test  &lt;- testing(ad_split)\nad_boot &lt;- bootstraps(ad_train, times = 50, strata = Class)\n\nad_boot %&gt;% slice(1) %&gt;% pluck(\"splits\") %&gt;% pluck(1) %&gt;% analysis() %&gt;% count(Class)\n#&gt; # A tibble: 2 × 2\n#&gt;   Class        n\n#&gt;   &lt;fct&gt;    &lt;int&gt;\n#&gt; 1 Impaired    68\n#&gt; 2 Control    181\n\nWe’ll use the bootstrap to measure performance during tuning."
+  },
+  {
+    "objectID": "index.html#model-and-recipe",
+    "href": "index.html#model-and-recipe",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Model and recipe",
+    "text": "Model and recipe\nLet’s fit a neural network and use a simple recipe that standardizes the predictors.\nWe’ll tune three model parameters:\n\nnnet_mod &lt;- \n  mlp(hidden_units = tune(), penalty = tune(), epochs = tune()) %&gt;% \n  set_mode(\"classification\")\n\nnnet_rec &lt;- \n  recipe(Class ~ ., data = ad_train) %&gt;% \n  step_dummy(Genotype) %&gt;% \n  step_zv(all_predictors()) %&gt;% \n  step_normalize(all_predictors())"
+  },
+  {
+    "objectID": "index.html#model-tuning-via-racing",
+    "href": "index.html#model-tuning-via-racing",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Model tuning via racing",
+    "text": "Model tuning via racing\nWe’ll use a tool called racing to tune a large number of model configurations efficiently.\n\nlibrary(finetune)\n\nset.seed(8239)\nnnet_tune_res &lt;- \n  nnet_mod %&gt;% \n  tune_race_anova(\n    nnet_rec,\n    resamples = ad_boot,\n    grid = 50,\n    control = control_race(verbose_elim = TRUE, save_pred = TRUE)\n  )\n\nThis only fits a fraction of the possible 2500 possible models via efficient interim analysis."
+  },
+  {
+    "objectID": "index.html#racing-process",
+    "href": "index.html#racing-process",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Racing process",
+    "text": "Racing process"
+  },
+  {
+    "objectID": "index.html#check-predictions",
+    "href": "index.html#check-predictions",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Check predictions",
+    "text": "Check predictions\nLet’s take the model with the largest ROC AUC as best:\n\nshow_best(nnet_tune_res, metric = \"roc_auc\")\n#&gt; # A tibble: 1 × 9\n#&gt;   hidden_units penalty epochs .metric .estimator  mean     n std_err .config    \n#&gt;          &lt;int&gt;   &lt;dbl&gt;  &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;      \n#&gt; 1            2   0.765    978 roc_auc binary     0.879    50 0.00468 Preprocess…\n\nbest_nnet &lt;- select_best(nnet_tune_res, metric = \"roc_auc\")\nbest_nnet\n#&gt; # A tibble: 1 × 4\n#&gt;   hidden_units penalty epochs .config              \n#&gt;          &lt;int&gt;   &lt;dbl&gt;  &lt;int&gt; &lt;chr&gt;                \n#&gt; 1            2   0.765    978 Preprocessor1_Model19\n\noob_pred &lt;- collect_predictions(nnet_tune_res, parameters = best_nnet)\n\nThe predictions are averages of the out-of-sample predictions,"
+  },
+  {
+    "objectID": "index.html#check-predictions-1",
+    "href": "index.html#check-predictions-1",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Check predictions",
+    "text": "Check predictions\nSo the model separates the classes but are the probabilities well-calibrated?\n\nYeah but no. Let’s mitigate the issue via post-processing using a few different methods."
+  },
+  {
+    "objectID": "index.html#logistic-calibration",
+    "href": "index.html#logistic-calibration",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Logistic calibration",
+    "text": "Logistic calibration\n\nset.seed(283)\nresampled_pred &lt;- oob_pred %&gt;% vfold_cv() \n\nresampled_pred %&gt;% \n  cal_validate_logistic(truth = Class) %&gt;% \n  collect_metrics()\n#&gt; # A tibble: 2 × 7\n#&gt;   .metric     .type        .estimator  mean     n std_err .config\n#&gt;   &lt;chr&gt;       &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;  \n#&gt; 1 brier_class uncalibrated binary     0.152    10 0.00163 config \n#&gt; 2 brier_class calibrated   binary     0.120    10 0.00296 config\n\nThe Brier score is a good metric to assess how well the model is calibrated.\nA value of zero is best and a really bad model for two classes has a value of (1 - (1/2))^2 = 0.25."
+  },
+  {
+    "objectID": "index.html#isotonic-calibration",
+    "href": "index.html#isotonic-calibration",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Isotonic calibration",
+    "text": "Isotonic calibration\n\nresampled_pred %&gt;% \n  cal_validate_isotonic(truth = Class) %&gt;% \n  collect_metrics()\n#&gt; # A tibble: 2 × 7\n#&gt;   .metric     .type        .estimator  mean     n std_err .config\n#&gt;   &lt;chr&gt;       &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;  \n#&gt; 1 brier_class uncalibrated binary     0.152    10 0.00163 config \n#&gt; 2 brier_class calibrated   binary     0.121    10 0.00321 config"
+  },
+  {
+    "objectID": "index.html#beta-calibration",
+    "href": "index.html#beta-calibration",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Beta calibration",
+    "text": "Beta calibration\n\nresampled_pred %&gt;% \n  cal_validate_beta(truth = Class) %&gt;% \n  collect_metrics()\n#&gt; # A tibble: 2 × 7\n#&gt;   .metric     .type        .estimator  mean     n std_err .config\n#&gt;   &lt;chr&gt;       &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;  \n#&gt; 1 brier_class uncalibrated binary     0.152    10 0.00163 config \n#&gt; 2 brier_class calibrated   binary     0.122    10 0.00285 config\n\nWe’ll try using the logistic model."
+  },
+  {
+    "objectID": "index.html#does-it-work",
+    "href": "index.html#does-it-work",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Does it work?",
+    "text": "Does it work?\n\n\n\nad_cal &lt;- \n  cal_estimate_logistic(oob_pred, truth = Class)\n\ncalibrated_pred &lt;- \n  oob_pred %&gt;% \n  cal_apply(ad_cal)\n\ncalibrated_pred %&gt;%\n  cal_plot_windowed(truth = Class,\n                    estimate = .pred_Impaired,\n                    step_size = 0.025)"
+  },
+  {
+    "objectID": "index.html#picking-a-final-model",
+    "href": "index.html#picking-a-final-model",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Picking a final model",
+    "text": "Picking a final model\nNormally, after searching through models, we pick one that we think should go forward.\n\nnnet_wflow &lt;- \n  nnet_rec %&gt;% \n  workflow(nnet_mod) %&gt;% \n  finalize_workflow(best_nnet)\nnnet_wflow\n#&gt; ══ Workflow ════════════════════════════════════════════════════════════════════\n#&gt; Preprocessor: Recipe\n#&gt; Model: mlp()\n#&gt; \n#&gt; ── Preprocessor ────────────────────────────────────────────────────────────────\n#&gt; 3 Recipe Steps\n#&gt; \n#&gt; • step_dummy()\n#&gt; • step_zv()\n#&gt; • step_normalize()\n#&gt; \n#&gt; ── Model ───────────────────────────────────────────────────────────────────────\n#&gt; Single Layer Neural Network Model Specification (classification)\n#&gt; \n#&gt; Main Arguments:\n#&gt;   hidden_units = 2\n#&gt;   penalty = 0.764635581502846\n#&gt;   epochs = 978\n#&gt; \n#&gt; Computational engine: nnet"
+  },
+  {
+    "objectID": "index.html#fitting-the-final-model",
+    "href": "index.html#fitting-the-final-model",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Fitting the final model",
+    "text": "Fitting the final model\nLet’s fit a model of ours on the the entire training set.\nIf we originally used initial_split(), we can also use last_fit() to do this:\n\ntest_res &lt;- \n  nnet_wflow %&gt;% \n  last_fit(split = ad_split)\n\nextract_fit_engine(test_res)\n#&gt; a 134-2-1 network with 273 weights\n#&gt; inputs: ACE_CD143_Angiotensin_Converti ACTH_Adrenocorticotropic_Hormon AXL Adiponectin Alpha_1_Antichymotrypsin Alpha_1_Antitrypsin Alpha_1_Microglobulin Alpha_2_Macroglobulin Angiopoietin_2_ANG_2 Angiotensinogen Apolipoprotein_A_IV Apolipoprotein_A1 Apolipoprotein_A2 Apolipoprotein_B Apolipoprotein_CI Apolipoprotein_CIII Apolipoprotein_D Apolipoprotein_E Apolipoprotein_H B_Lymphocyte_Chemoattractant_BL BMP_6 Beta_2_Microglobulin Betacellulin C_Reactive_Protein CD40 CD5L Calbindin Calcitonin CgA Clusterin_Apo_J Complement_3 Complement_Factor_H Connective_Tissue_Growth_Factor Cortisol Creatine_Kinase_MB Cystatin_C EGF_R EN_RAGE ENA_78 Eotaxin_3 FAS FSH_Follicle_Stimulation_Hormon Fas_Ligand Fatty_Acid_Binding_Protein Ferritin Fetuin_A Fibrinogen GRO_alpha Gamma_Interferon_induced_Monokin Glutathione_S_Transferase_alpha HB_EGF HCC_4 Hepatocyte_Growth_Factor_HGF I_309 ICAM_1 IGF_BP_2 IL_11 IL_13 IL_16 IL_17E IL_1alpha IL_3 IL_4 IL_5 IL_6 IL_6_Receptor IL_7 IL_8 IP_10_Inducible_Protein_10 IgA Insulin Kidney_Injury_Molecule_1_KIM_1 LOX_1 Leptin Lipoprotein_a MCP_1 MCP_2 MIF MIP_1alpha MIP_1beta MMP_2 MMP_3 MMP10 MMP7 Myoglobin NT_proBNP NrCAM Osteopontin PAI_1 PAPP_A PLGF PYY Pancreatic_polypeptide Prolactin Prostatic_Acid_Phosphatase Protein_S Pulmonary_and_Activation_Regulat RANTES Resistin S100b SGOT SHBG SOD Serum_Amyloid_P Sortilin Stem_Cell_Factor TGF_alpha TIMP_1 TNF_RII TRAIL_R3 TTR_prealbumin Tamm_Horsfall_Protein_THP Thrombomodulin Thrombopoietin Thymus_Expressed_Chemokine_TECK Thyroid_Stimulating_Hormone Thyroxine_Binding_Globulin Tissue_Factor Transferrin Trefoil_Factor_3_TFF3 VCAM_1 VEGF Vitronectin von_Willebrand_Factor age tau p_tau Ab_42 male Genotype_E2E3 Genotype_E2E4 Genotype_E3E3 Genotype_E3E4 Genotype_E4E4 \n#&gt; output(s): ..y \n#&gt; options were - entropy fitting  decay=0.765"
+  },
+  {
+    "objectID": "index.html#test-set-evaluation",
+    "href": "index.html#test-set-evaluation",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Test set evaluation",
+    "text": "Test set evaluation\nOrdinarily, we would use collect_metrics() on this to get our test set results.\nHowever, we have to apply the calibration the test set predictions first:\n\ntest_pred &lt;- \n  test_res %&gt;% \n  collect_predictions() %&gt;% \n  cal_apply(ad_cal)\n\ncls_metrics &lt;- metric_set(roc_auc, brier_class)\ncls_metrics(test_pred, Class, .pred_Impaired)\n#&gt; # A tibble: 2 × 3\n#&gt;   .metric     .estimator .estimate\n#&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;\n#&gt; 1 roc_auc     binary         0.860\n#&gt; 2 brier_class binary         0.127"
+  },
+  {
+    "objectID": "index.html#test-set-roc-curve",
+    "href": "index.html#test-set-roc-curve",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Test set ROC curve",
+    "text": "Test set ROC curve\n\n\n\ntest_pred %&gt;% \n  roc_curve(Class, .pred_Impaired) %&gt;% \n  autoplot()"
+  },
+  {
+    "objectID": "index.html#test-set-calibration-curve",
+    "href": "index.html#test-set-calibration-curve",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Test set calibration curve",
+    "text": "Test set calibration curve\n\n\n\ntest_pred %&gt;%\n  cal_plot_windowed(truth = Class,\n                    estimate = .pred_Impaired,\n                    step_size = 0.025)"
+  },
+  {
+    "objectID": "index.html#next-steps",
+    "href": "index.html#next-steps",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Next steps",
+    "text": "Next steps\nIf this model was best, we would fit the model on the entire training set (via the last_fit()) function the measure performance on the test set.\nSome other things to do with these data:\n\nmodel explainers\nmodel stacking\nmodel deployment using vetiver"
+  },
+  {
+    "objectID": "index.html#other-extensions",
+    "href": "index.html#other-extensions",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Other extensions",
+    "text": "Other extensions\n\ncensored data models (a.k.a survival analysis)\ncase weights\nconformal inference tools for prediction intervals\n\nIn-process:\n\nmodel fairness metrics and modeling techniques\ncausal inference methods\na general set of post-processing tools"
+  },
+  {
+    "objectID": "index.html#thanks",
+    "href": "index.html#thanks",
+    "title": "(tidy)Modeling Workshop",
+    "section": "Thanks",
+    "text": "Thanks\nThanks for the invitation to speak today!\nThe tidymodels team: Hanna Frick, Emil Hvitfeldt, and Simon Couch.\nSpecial thanks to the other folks who contributed so much to tidymodels: Davis Vaughan, Edgar Ruiz, Alison Hill, Desirée De Leon, our previous interns, and the tidyverse team.\n\n\nhttps://topepo.github.io/2023_Shell_bootcamp"
+  }
+]
